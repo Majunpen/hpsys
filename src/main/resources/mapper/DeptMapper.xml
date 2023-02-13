@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.mapper.DeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hp.pojo.Dept">
+        <id column="id" property="id" />
+        <result column="dept_num" property="deptNum" />
+        <result column="dept_name" property="deptName" />
+        <result column="parent_id" property="parentId" />
+        <result column="level" property="level" />
+        <result column="manager_id" property="managerId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, dept_num, dept_name, parent_id, level, manager_id, create_time, update_time, status
+    </sql>
+
+    <select id="selectAllDepts" resultType="com.hp.pojo.Dept">
+        SELECT
+            d.`id`,
+            d.`dept_num`,
+            d.`parent_id`,
+            d.`dept_name`,
+            d.`create_time`,
+            d.`update_time`,
+            d.`level`,
+            e.`emp_name` AS manager,
+            IFNULL(d2.`dept_name`,"-") AS parent_dept_name
+        FROM
+            t_dept d
+                LEFT JOIN t_employee e
+                          ON d.`manager_id` = e.`id`
+                LEFT JOIN t_dept d2
+                          ON d.`parent_id` = d2.`id`
+        WHERE d.`status`=1
+    </select>
+
+   <!-- <select id="findDeptDtoByParentDeptId" resultType="com.hp.dto.DeptDto">
+        SELECT id,dept_name AS title FROM t_dept WHERE parent_id=#{parentId} AND STATUS=1
+    </select>-->
+
+    <select id="findDeptDtoByParentDeptId" resultType="com.hp.dto.DeptDto">
+        SELECT id,dept_name AS title FROM t_dept WHERE parent_id=#{parentId} AND STATUS=1
+    </select>
+</mapper>

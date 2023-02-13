@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.mapper.MenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hp.pojo.Menu">
+        <id column="id" property="id" />
+        <result column="menu_name" property="menuName" />
+        <result column="menu_style" property="menuStyle" />
+        <result column="url" property="url" />
+        <result column="parent_id" property="parentId" />
+        <result column="parent_opt_value" property="parentOptValue" />
+        <result column="grade" property="grade" />
+        <result column="opt_value" property="optValue" />
+        <result column="orders" property="orders" />
+        <result column="is_valid" property="isValid" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, menu_name, menu_style, url, parent_id, parent_opt_value, grade, opt_value, orders, is_valid, create_date, update_date
+    </sql>
+    <select id="queryAllMenus" resultType="com.hp.dto.TreeDto">
+        SELECT
+            id,
+            IFNULL(parent_id, 0) AS pId,
+            menu_name AS NAME
+        FROM
+            t_menu
+        WHERE is_valid = 1
+    </select>
+
+    <select id="selectAllMenus" resultType="com.hp.pojo.Menu">
+        SELECT
+            m1.*,
+            IFNULL(m2.menu_name, "-") AS parentName
+        FROM
+            t_menu m1
+                LEFT JOIN t_menu m2
+                          ON m1.parent_id = m2.id
+        WHERE m1.is_valid = 1
+    </select>
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.mapper.EmployeeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hp.pojo.Employee">
+        <id column="id" property="id" />
+        <result column="emp_num" property="empNum" />
+        <result column="emp_name" property="empName" />
+        <result column="gender" property="gender" />
+        <result column="birthday" property="birthday" />
+        <result column="location" property="location" />
+        <result column="on_board_date" property="onBoardDate" />
+        <result column="mobile" property="mobile" />
+        <result column="qq" property="qq" />
+        <result column="email" property="email" />
+        <result column="weixin" property="weixin" />
+        <result column="dept_id" property="deptId" />
+        <result column="title_category_id" property="titleCategoryId" />
+        <result column="title_id" property="titleId" />
+        <result column="employ_status_id" property="employStatusId" />
+        <result column="graduate_school" property="graduateSchool" />
+        <result column="education" property="education" />
+        <result column="formal_status" property="formalStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, emp_num, emp_name, gender, birthday, location, on_board_date, mobile, qq, email, weixin, dept_id, title_category_id, title_id, employ_status_id, graduate_school, education, formal_status
+    </sql>
+
+    <!--员工信息查询-->
+    <select id="getEmployeeList" resultType="com.hp.vo.EmployeeVo">
+        SELECT
+            e.*,
+            a.user_name,
+            d.dept_name,
+            c.title_name,
+            s.`name` as emp_status
+        FROM t_employee e
+                 LEFT JOIN t_account a ON e.id =a.emp_id
+                 LEFT JOIN t_dept d ON e.dept_id =d.id
+                 LEFT JOIN t_title_category c ON e.title_category_id = c.id
+                 LEFT JOIN t_employee_status s ON e.employ_status_id =s.id
+        WHERE e.status=1
+          <if test="null != employeeQuery.empName and employeeQuery.empName != ''">
+              AND e.emp_name LIKE CONCAT('%',#{ employeeQuery.empName},'%')
+          </if>
+         <if test="null != employeeQuery.deptId">
+             AND e.dept_id=#{employeeQuery.deptId}
+         </if>
+          <if test="null != employeeQuery.empNum and employeeQuery.empNum != ''">
+              AND e.emp_num=#{employeeQuery.empNum}
+          </if>
+
+    </select>
+
+
+    <select id="queryDeptMangerByUserName" parameterType="int" resultType="com.hp.pojo.Employee">
+        SELECT
+            *
+        FROM
+            t_employee
+        WHERE id =
+              (SELECT
+                   d.manager_id
+               FROM
+                   t_employee e
+                       LEFT JOIN t_dept d
+                                 ON e.dept_id = d.id
+               WHERE e.id = #{id})
+    </select>
+
+    <select id="findEmp" parameterType="string" resultType="com.hp.pojo.Employee">
+        SELECT e.* FROM t_employee e
+                            LEFT JOIN t_title_category tc ON e.title_category_id = tc.id
+        WHERE tc.title_name=#{titleName}
+    </select>
+
+</mapper>

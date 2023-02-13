@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.mapper.AccountRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hp.pojo.AccountRole">
+        <id column="id" property="id" />
+        <result column="account_id" property="accountId" />
+        <result column="role_id" property="roleId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, account_id, role_id
+    </sql>
+    <select id="accountRoleList" resultType="com.hp.dto.AccountRoleDto">
+        SELECT
+        ar.account_id AS aid,
+        a.user_name,
+        e.emp_num,
+        e.emp_name
+        FROM
+        t_account_role ar
+        LEFT JOIN t_role r
+        ON ar.role_id = r.id
+        LEFT JOIN t_account a
+        ON ar.account_id = a.id
+        LEFT JOIN t_employee e
+        ON a.emp_id = e.id
+        <where>
+            ar.role_id=#{accountRoleQuey.roleId}
+            <if test="null != accountRoleQuey.empName and accountRoleQuey.empName != ''">
+                AND e.emp_name LIKE CONCAT('%',#{accountRoleQuey.empName},'%')
+            </if>
+            <if test="null != accountRoleQuey.empNum and accountRoleQuey.empNum != ''">
+                AND e.emp_num = #{accountRoleQuey.empNum}
+            </if>
+
+        </where>
+    </select>
+</mapper>
